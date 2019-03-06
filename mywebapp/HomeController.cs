@@ -1,41 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Hosting;
 using SignalRWebPack.Hubs;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace mywebapp
 {
-    public class HomeController : Controller
+    public class HomeController : IHostedService, IDisposable
     {
 
-
-        private IHubContext<ChatHub> _hubContext
-        {
-            get;
-            set;
-        }
+        public static IHubContext<ChatHub> HubContext;
 
         public HomeController(IHubContext<ChatHub> hubContext)
         {
-            _hubContext = hubContext;
+            HubContext = hubContext;
         }
 
-        public Task CnewMessage(string username, string message)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            {
-                if (!ChatHub.participants.Contains(username))
-                {
-                    ChatHub.participants.Add(username);
-                    return _hubContext.Clients.All.SendAsync("newParticipant", username);
-                }
-                return _hubContext.Clients.All.SendAsync("messageReceived", username, message);
-            }
+            //TODO: your start logic, some timers, singletons, etc
+            return Task.CompletedTask;
         }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            //TODO: your stop logic
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+        }
+
 
 
     }

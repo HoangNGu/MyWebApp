@@ -10,8 +10,12 @@ namespace SignalRWebPack.Hubs
     public class ChatHub : Hub
     {
         public static List<String> participants = new List<String>();
-        private static readonly IHubContext<ChatHub> _hubContext;
+        protected static IHubContext<ChatHub> _hubContext;
 
+        public ChatHub(IHubContext<ChatHub> context)
+        {
+            _hubContext = context;
+        }
 
         public async Task newMessage(string username, string message)
         {
