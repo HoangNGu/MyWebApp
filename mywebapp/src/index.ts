@@ -8,6 +8,7 @@ const tbMessage: HTMLInputElement = document.querySelector("#tbMessage");
 const btnSend: HTMLButtonElement = document.querySelector("#btnSend");
 var mutedUsers: Array<string> = [];
 var participants: Array<string> = [];
+var mySessionNickname: Array<string> = [];
 
 const connection = new signalR.HubConnectionBuilder()
 	.withUrl("/hub")
@@ -132,6 +133,7 @@ tbMessage.addEventListener("keyup", (e: KeyboardEvent) => {
     }
 });
 
+
 btnSend.addEventListener("click", Send);
 
 function displayMessage(message: string, isNotification: boolean) {
@@ -151,7 +153,6 @@ function displayMessage(message: string, isNotification: boolean) {
     divMessages.scrollTop = divMessages.scrollHeight;
 
 }
-
 
 
 

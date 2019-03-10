@@ -9,6 +9,7 @@ var tbMessage = document.querySelector("#tbMessage");
 var btnSend = document.querySelector("#btnSend");
 var mutedUsers = [];
 var participants = [];
+var mySessionNickname = [];
 var connection = new signalR.HubConnectionBuilder()
     .withUrl("/hub")
     .build();
