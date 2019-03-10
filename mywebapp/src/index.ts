@@ -7,6 +7,7 @@ const tbNickname: HTMLInputElement = document.querySelector("#tbNickname");
 const tbMessage: HTMLInputElement = document.querySelector("#tbMessage");
 const btnSend: HTMLButtonElement = document.querySelector("#btnSend");
 var mutedUsers: Array<string> = [];
+var participants: Array<string> = [];
 
 const connection = new signalR.HubConnectionBuilder()
 	.withUrl("/hub")
@@ -14,56 +15,86 @@ const connection = new signalR.HubConnectionBuilder()
 
 connection.start().catch(err => document.write(err));
 
-connection.on("messageReceived", (nickname: string, message: string) => {
-    if (mutedUsers.indexOf(nickname,0) == -1) { 
-	    let m = document.createElement("div");
-	    m.innerHTML =
-            `<div class=${nickname}.message-author>${nickname + ":"}</div><div class=${nickname}.message-author>${message}</div>`;
+connection.on("ConnectionEstablished", () => {
+    displayMessage("Connection to the server established",false);
+});
 
+connection.on("messageReceived", (nickname: string, message: string) => {
+
+    if (participants.indexOf(nickname, 0) == -1) { //Check if the participant has already spoken in the chat session
+        NewParticipants(nickname);
+    }
+    if (mutedUsers.indexOf(nickname, 0) == -1) { //Check if the participant is muted or not before keeping the message in chat history
+        let m = document.createElement("div");
+	    m.innerHTML =
+            `<div class=${nickname}.message-author>${"[" + nickname + "] " + message}</div>`;
+        var color = <HTMLInputElement>document.getElementById(nickname + ".input-zone-color");
+        m.style.color = color.value;
 	    divMessages.appendChild(m);
         divMessages.scrollTop = divMessages.scrollHeight;
+
     }
 });
 
-connection.on("newParticipant", (nickname: string) => {
+function NewParticipants(nickname: string) {
+    // Handle the list of participants
+    participants.push(nickname);
     let p = document.createElement("div");
     let m = document.createElement("div");
 
-    p.innerHTML =
-        `<label id="lblMessage" for= "btnMute" > ${nickname} </label>      
-        <input type="checkbox" id=${nickname}.btnMute > Mute/Unmute </input>`;
+    if (tbNickname.value != nickname) {
+        p.innerHTML =
+            `
+        <div style="display: flex; justify-content: space-around">
+        <label style = "width:100px; overflow: hidden;" class = ${nickname}.participant-nickname id="lblMessage"> ${nickname} </label>      
+        <input type="color" id=${nickname}.input-zone-color value="#000000">
+        <input type="checkbox" id=${nickname}.btnMute ></input>
+        <label for=${nickname}.btnMute></label>
+        </div>
+        `;
+        divParticpants.appendChild(p);
+        divParticpants.scrollTop = divParticpants.scrollHeight;
 
-  
+        document.getElementById(nickname + ".btnMute").addEventListener("click", function () {
+            MuteUser(nickname);
+        });
+        
+        document.getElementById(nickname + ".input-zone-color").addEventListener("input", function () {
+            ChangeColor(nickname);
+        });
+    }
+    else {
+        p.innerHTML =
+            `<div style="display: flex; justify-content: space-around">
+            <div style = "width:100px; overflow: hidden;" class = ${nickname}.participant-nickname> ${nickname} </div>
+            <input  type="color" id=${nickname}.input-zone-color value="#000000">
+            </div>`;
 
-    divParticpants.appendChild(p);
-    divParticpants.scrollTop = divParticpants.scrollHeight;
+        divParticpants.appendChild(p);
+        divParticpants.scrollTop = divParticpants.scrollHeight;
 
-    m.innerHTML =
-        `<div">${nickname + " has joined the chat!"}</div>`;
-    divMessages.appendChild(m);
-    divMessages.scrollTop = divMessages.scrollHeight;
+        document.getElementById(nickname + ".input-zone-color").addEventListener("input", function () {
+            ChangeColor(nickname);
+        });
+    }
+    displayMessage(nickname + " has joined the chat!", true);
 
-    document.getElementById(nickname + ".btnMute").addEventListener("click", function () {
-        muteUser(nickname);
-    });
-});
+}
 
-tbMessage.addEventListener("keyup", (e: KeyboardEvent) => {
-	if (e.keyCode === 13) {
-		send();
-	}
-});
+function ChangeColor(nickname: string) {
+    var colorWell = <HTMLInputElement>document.getElementById(nickname + ".input-zone-color");
 
-btnSend.addEventListener("click", send);
+    let elements = document.getElementsByClassName(nickname + ".message-author") as HTMLCollectionOf<HTMLElement>
+    for (var i in elements) {
+        elements[i].style.color = colorWell.value;
+    }}
 
-
-
-function muteUser(nickname: string) {
+function MuteUser(nickname: string) {
     var checkbox = <HTMLInputElement> document.getElementById(nickname + ".btnMute");
-    if (checkbox.checked) {
+    if (checkbox.checked) { 
         mutedUsers.push(nickname);
         alert("The user " + nickname + " is now muted");
-        let elements = document.getElementsByClassName(nickname+".message-author") as HTMLCollectionOf<HTMLElement>
+        let elements = document.getElementsByClassName(nickname + ".message-author") as HTMLCollectionOf<HTMLElement> //Hide messages of muted user
         for (var i in elements) {
             elements[i].style.display = "none";
         }
@@ -75,7 +106,7 @@ function muteUser(nickname: string) {
             mutedUsers.splice(index, 1);
         }
         alert("The user " + nickname + " is now unmuted");
-        let elements = document.getElementsByClassName(nickname + ".message-author") as HTMLCollectionOf<HTMLElement>
+        let elements = document.getElementsByClassName(nickname + ".message-author") as HTMLCollectionOf<HTMLElement> //Display messages of muted user
         for (var i in elements) {
             elements[i].style.display = "inline";
         }
@@ -85,19 +116,43 @@ function muteUser(nickname: string) {
     
 }
 
-
-function send() {
+function Send() {
     if (tbNickname.value != "") {
         connection.send("newMessage", tbNickname.value, tbMessage.value)
             .then(() => tbMessage.value = "");
     }
     else {
-        let m = document.createElement("div");
-
-        m.innerHTML =
-            `<div class="message-error">${"Please enter a Nickname"}</div>`;
-
-        divMessages.appendChild(m);
-        divMessages.scrollTop = divMessages.scrollHeight;
+        displayMessage("Please enter a Nickname",true);
     }
 }
+
+tbMessage.addEventListener("keyup", (e: KeyboardEvent) => {
+    if (e.keyCode == 13) {
+        Send();
+    }
+});
+
+btnSend.addEventListener("click", Send);
+
+function displayMessage(message: string, isNotification: boolean) {
+    let m = document.createElement("div");
+
+    if (isNotification) {
+        m.innerHTML =
+            `<div class="message-error">${message}</div>`;
+    }
+    else {
+        m.innerHTML =
+            `<div>${message}</div>`;
+    }
+    
+
+    divMessages.appendChild(m);
+    divMessages.scrollTop = divMessages.scrollHeight;
+
+}
+
+
+
+
+

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,7 +8,7 @@ namespace SignalRWebPack.Hubs
 {
     public class ChatHub : Hub
     {
-        public static List<String> participants = new List<String>();
+        public List<String> sessionParticipants = new List<String>();
         protected static IHubContext<ChatHub> _hubContext;
 
         public ChatHub(IHubContext<ChatHub> context)
@@ -17,28 +16,20 @@ namespace SignalRWebPack.Hubs
             _hubContext = context;
         }
 
-        public async Task newMessage(string username, string message)
+        public override async Task OnConnectedAsync()
         {
-            if (!participants.Contains(username))
+            await Clients.Caller.SendAsync("ConnectionEstablished");
+            await base.OnConnectedAsync();
+        }
+
+        public async Task NewMessage(string username, string message)
+        {
+            if (sessionParticipants.IndexOf(username, 0) == -1)
             {
-                participants.Add(username);
-                await Clients.All.SendAsync("newParticipant", username);
-                
+                sessionParticipants.Add(username);
             }
             await Clients.All.SendAsync("messageReceived", username, message);
         }
-
-        public static void Static_newMessage(string username, string message)
-        {
-
-            if (!participants.Contains(username))
-            {
-                participants.Add(username);
-                _hubContext.Clients.All.SendAsync("newParticipant", username);
-            }
-            _hubContext.Clients.All.SendAsync("messageReceived", username, message);
-        }
-
 
     }
 }

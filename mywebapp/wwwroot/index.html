@@ -3,24 +3,37 @@
 <head>
 	<meta charset="utf-8" />
 	<title>BITCRAFT - CHAT</title>
-<link href="/css/main.22ee8a8f6607a8d671bc.css" rel="stylesheet"></head>
+<link href="/css/main.232a4b773fb1f603cd8c.css" rel="stylesheet"></head>
 <body>
     <div class="output-zone">
 
         <div id="divUsers" class="usersList">
-            <label class="title" for="tbNickname">Participant</label>
+            <label class="title" for="tbNickname">Participants</label>
         </div>
         <div id="divMessages" class="messages">
         </div>
     </div>
 
     <div class="input-zone">
-        <label id="nickname" for="tbNickname">Nickname:</label>
-        <input id="tbNickname" class="input-zone-nickname" type="text" />
 
-        <label id="lblMessage" for="tbMessage">Message:</label>
+
+        <label id="nickname" for="tbNickname">Nickname:</label>
+        <input id="tbNickname" class="input-zone-nickname" type="text" onkeypress="return AvoidSpace(event)" />
+
+
+
+        <label id="lblMessage" for="tbMessage">Messages:</label>
         <input id="tbMessage" class="input-zone-input" type="text" />
         <button id="btnSend">Send</button>
     </div>
-<script src="/main.22ee8a8f6607a8d671bc.js"></script></body>
+<script src="/main.232a4b773fb1f603cd8c.js"></script></body>
 </html>
+<script>
+    /* restrict use of space in nickname*/
+
+    function AvoidSpace(event) {
+        var k = event ? event.which : window.event.keyCode;
+        if (k == 32) return false;
+    }
+
+</script>

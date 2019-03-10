@@ -1,16 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Client;
-using SignalRWebPack.Hubs;
 
 namespace mywebapp
 {
@@ -18,9 +9,7 @@ namespace mywebapp
     {
         public static bool isConnected = false;
         public static Thread SocketThread = new Thread(Server);
-        private static TcpListener OneTcpListener;
-        public static HomeController hc;
-        public static IHubContext<ChatHub> HubContext;
+       
 
 
         public static void Main(string[] args)
@@ -38,12 +27,11 @@ namespace mywebapp
                 .UseStartup<Startup>().Build();
 
 
-        
-            
+        public static void Server()
 
-        
-
-
+        {
+            TelnetClientHandler.Server();
+        }
 
 
 
