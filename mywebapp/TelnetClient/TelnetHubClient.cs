@@ -24,7 +24,7 @@ namespace mywebapp
         public TelnetHubClient(TcpClient client)
         {
             /// <summary>
-            /// Telnet Client connected to the Hub
+            /// This class handles the interaction with the telnet TCP client.
             /// </summary>
             /// <param name="res"></param>
             /// 
