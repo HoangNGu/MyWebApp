@@ -1,39 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8" />
-	<title>BITCRAFT - CHAT</title>
-<link href="/css/main.3ab2faf66fa21f2d73e2.css" rel="stylesheet"></head>
-<body>
-    <div class="output-zone">
-
-        <div id="divUsers" class="usersList">
-            <label class="title" for="tbNickname">Participants</label>
-        </div>
-        <div id="divMessages" class="messages">
-        </div>
-    </div>
-
-    <div class="input-zone">
-
-
-        <label id="nickname" for="tbNickname">Nickname:</label>
-        <input id="tbNickname" class="input-zone-nickname" type="text" onkeypress="return AvoidSpace(event)" />
-
-
-
-        <label id="lblMessage" for="tbMessage">Messages:</label>
-        <input id="tbMessage" class="input-zone-input" type="text" />
-        <button id="btnSend">Send</button>
-    </div>
-<script src="/main.3ab2faf66fa21f2d73e2.js"></script></body>
-</html>
-<script>
-    /* restrict use of space in nickname*/
+<!doctype html><html><head><meta charset="utf-8"><title>BITCRAFT - CHAT</title><link href="/css/main.c45d7e27908dfb8d01fe.css" rel="stylesheet"></head><body><div class="output-zone"><div id="divUsers" class="usersList"><label class="title" for="tbNickname">Participants</label></div><div id="divMessages" class="messages"></div></div><div class="input-zone"><label id="nickname" for="tbNickname">Nickname:</label> <input id="tbNickname" class="input-zone-nickname" onkeypress="return AvoidSpace(event)"> <label id="lblMessage" for="tbMessage">Messages:</label> <input id="tbMessage" class="input-zone-input"> <button id="btnSend">Send</button></div><script src="/main.c45d7e27908dfb8d01fe.js"></script></body></html><script>/* restrict use of space in nickname*/
 
     function AvoidSpace(event) {
         var k = event ? event.which : window.event.keyCode;
         if (k == 32) return false;
-    }
-
-</script>
+    }</script>
